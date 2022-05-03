@@ -1,0 +1,2 @@
+module ProgJava2022 {
+}
