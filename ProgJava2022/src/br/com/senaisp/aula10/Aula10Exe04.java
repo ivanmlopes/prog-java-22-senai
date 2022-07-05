@@ -1,9 +1,9 @@
-package br.com.senaisp.aula06;
+package br.com.senaisp.aula10;
 
 import java.util.Locale;
 import java.util.Scanner;
 
-public class Aula06Exe04 {
+public class Aula10Exe04 {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -16,22 +16,20 @@ public class Aula06Exe04 {
 			System.out.println("1 - Celsius");
 			System.out.println("2 - Fahrenheit");
 			System.out.println("3 - Kelvin");
-			int intTempOri = entradaTemperatura (sc, "Temperatura Origem: (1 ou 2 ou 3)");
-			/*
+			int intTempOri;
 			do {
 				System.out.println("Temperatura Origem: (1 ou 2 ou 3)");
 				intTempOri = sc.nextInt();
 			} while (intTempOri != 1 && intTempOri != 2 && intTempOri != 3);
-			*/
+
 			System.out.println("Valor Temperatura a ser convertida:");
 			double dblTemperatura = sc.nextDouble();
-			int intTempDes = entradaTemperatura (sc, "Temperatura Destino: (1 ou 2 ou 3)");
-			/*
+			int intTempDes;
 			do {
 				System.out.println("Temperatura Destino: (1 ou 2 ou 3)");
 				intTempDes = sc.nextInt();
 			} while (intTempDes != 1 && intTempDes != 2 && intTempDes != 3);
-			*/
+
 			double dblTempConv = dblTemperatura;
 			// teste de conversão
 			if (intTempOri == 1) { // testando origem celsius
@@ -60,17 +58,5 @@ public class Aula06Exe04 {
 		}
 
 	}
-	/**
-	 * Função que dará entrada na temperatura e tratará os valores entre 1,2 ou 3
-	 * @param sc Deve ser passado o Scanner para entrada de dados
-	 * @return Retorno um valor inteiro entre 1 e 3
-	 */
-public static int entradaTemperatura(Scanner sc, String strMsg) {
-	int intTempOri;
-	do {
-		System.out.println(strMsg);
-		intTempOri = sc.nextInt();
-	} while (intTempOri != 1 && intTempOri != 2 && intTempOri != 3); 
-	return intTempOri;
-}
+
 }
