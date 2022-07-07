@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
@@ -30,7 +31,7 @@ public class FormOrientacaoManutencao extends JFrame {
 	private JTextField txtId;
 	private JTextField txtPalavraChave;
 	private JTextField txtTitulo;
-	private int tipoOperacao; //1-create, 2-read, 3-update, 4-delete
+	private int tipoOperacao; // 1-create, 2-read, 3-update, 4-delete
 	private Orientacao or;
 	private JEditorPane edPnlTexto;
 	private JButton btnConfirmar;
@@ -59,76 +60,77 @@ public class FormOrientacaoManutencao extends JFrame {
 		setTitle("Manuten\u00E7\u00E3o Orienta\u00E7\u00E3o");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 800, 500);
+		setLocationRelativeTo(null);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
-		
+
 		JPanel pnlBotoes = new JPanel();
 		contentPane.add(pnlBotoes, BorderLayout.SOUTH);
-		
+
 		btnConfirmar = new JButton("Confirmar");
 		pnlBotoes.add(btnConfirmar);
 		btnConfirmar.addActionListener(evt);
-		
+
 		JButton btnCancelar = new JButton("Cancelar");
 		pnlBotoes.add(btnCancelar);
 		btnCancelar.addActionListener(evt);
-		
+
 		JPanel pnlCampos = new JPanel();
 		contentPane.add(pnlCampos, BorderLayout.NORTH);
 		pnlCampos.setLayout(new GridLayout(3, 0, 0, 0));
-		
+
 		JPanel pnlId = new JPanel();
 		FlowLayout fl_pnlId = (FlowLayout) pnlId.getLayout();
 		fl_pnlId.setAlignment(FlowLayout.LEFT);
 		pnlCampos.add(pnlId);
-		
+
 		JLabel lblId = new JLabel("ID");
 		pnlId.add(lblId);
-		
+
 		txtId = new JTextField();
 		pnlId.add(txtId);
 		txtId.setColumns(10);
-		
+
 		JPanel pnlPalavraChave = new JPanel();
 		FlowLayout fl_pnlPalavraChave = (FlowLayout) pnlPalavraChave.getLayout();
 		fl_pnlPalavraChave.setAlignment(FlowLayout.LEFT);
 		pnlCampos.add(pnlPalavraChave);
-		
+
 		JLabel lblPalavraChave = new JLabel("Palavras Chave");
 		pnlPalavraChave.add(lblPalavraChave);
-		
+
 		txtPalavraChave = new JTextField();
 		pnlPalavraChave.add(txtPalavraChave);
 		txtPalavraChave.setColumns(20);
-		
+
 		JPanel pnlTitulo = new JPanel();
 		FlowLayout fl_pnlTitulo = (FlowLayout) pnlTitulo.getLayout();
 		fl_pnlTitulo.setAlignment(FlowLayout.LEFT);
 		pnlCampos.add(pnlTitulo);
-		
+
 		JLabel lblTitulo = new JLabel("Titulo");
 		pnlTitulo.add(lblTitulo);
-		
+
 		txtTitulo = new JTextField();
 		pnlTitulo.add(txtTitulo);
 		txtTitulo.setColumns(10);
-		
+
 		JPanel pnlEditor = new JPanel();
 		contentPane.add(pnlEditor, BorderLayout.CENTER);
 		pnlEditor.setLayout(new BorderLayout(0, 0));
-		
+
 		JPanel pnlEditorLabel = new JPanel();
 		FlowLayout fl_pnlEditorLabel = (FlowLayout) pnlEditorLabel.getLayout();
 		pnlEditor.add(pnlEditorLabel, BorderLayout.NORTH);
-		
+
 		JLabel lblEditor = new JLabel("Orienta\u00E7\u00E3o");
 		pnlEditorLabel.add(lblEditor);
-		
+
 		JScrollPane scrollPane = new JScrollPane();
 		pnlEditor.add(scrollPane, BorderLayout.CENTER);
-		
+
 		edPnlTexto = new JEditorPane();
 		edPnlTexto.setContentType("text/rtf");
 		scrollPane.setViewportView(edPnlTexto);
@@ -137,69 +139,78 @@ public class FormOrientacaoManutencao extends JFrame {
 	public void setTipoOperacao(int tipoOperacao) {
 		this.tipoOperacao = tipoOperacao;
 		txtId.setEditable(false);
-		txtPalavraChave.setEditable(tipoOperacao==1 || tipoOperacao==3);
+		txtPalavraChave.setEditable(tipoOperacao == 1 || tipoOperacao == 3);
 		txtTitulo.setEditable(txtPalavraChave.isEditable());
 		edPnlTexto.setEditable(txtPalavraChave.isEditable());
-		btnConfirmar.setEnabled(tipoOperacao!=2);
-		
+		btnConfirmar.setEnabled(tipoOperacao != 2);
+
 		txtId.setText(Integer.toString(or.getId()));
 		txtPalavraChave.setText(or.getPalavraChave());
 		txtTitulo.setText(or.getTitulo());
-		Document doc = edPnlTexto.getDocument();
-		try {
-			doc.insertString(0, or.getTexto(), null);
-		} catch (BadLocationException e) {
-			e.printStackTrace();
+		if (or.getTexto() != null) {
+			Document doc = edPnlTexto.getDocument();
+			RTFEditorKit rtf = new RTFEditorKit();
+			ByteArrayInputStream bin = new ByteArrayInputStream(or.getTexto().getBytes());
+
+			try {
+				rtf.read(bin, doc, 0);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
 	public void setOr(Orientacao or) {
 		this.or = or;
 	}
+
 	class EventoClick implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JButton btn = (JButton) e.getSource();
-			if(btn.getText().equals("Confirmar")) {
-				boolean haErro = false;
-				if(tipoOperacao==1 || tipoOperacao == 3) {
+			if (btn.getText().equals("Confirmar")) {
+				boolean nHaErro = false;
+				if (tipoOperacao == 1 || tipoOperacao == 3) {
 					or.setPalavraChave(txtPalavraChave.getText());
 					or.setTitulo(txtTitulo.getText());
-					//obtendo o codigo rtf do texto digitado para poder armazenar no banco de dados
+					// obtendo o codigo rtf do texto digitado para poder armazenar no banco de dados
 					RTFEditorKit rtf = new RTFEditorKit();
 					Document doc = edPnlTexto.getDocument();
 					ByteArrayOutputStream str = new ByteArrayOutputStream();
-					
+
 					try {
 						rtf.write(str, doc, 0, doc.getLength());
 						or.setTexto(str.toString());
-						
+
 					} catch (Exception e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
-					};
-					if(tipoOperacao==1) {
-						haErro = or.create();
-					}else {
-						haErro = or.update();
 					}
-				}else { // excluir
-					if(JOptionPane.showConfirmDialog(null, "Confirma exclusao?", "Confirmaçaõ", JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION) {
-						haErro = or.delete();
+					;
+					if (tipoOperacao == 1) {
+						nHaErro = or.create();
+					} else {
+						nHaErro = or.update();
+					}
+				} else { // excluir
+					nHaErro = true;
+					if (JOptionPane.showConfirmDialog(null, "Confirma exclusao?", "Confirmaçaõ",
+							JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+						nHaErro = or.delete();
 					}
 				}
-				if(haErro) {
+				if (!nHaErro) {
 					JOptionPane.showMessageDialog(null, "Ocorreu um erro! Erro: " + or.getMsgErro());
-					
+
 				}
 				dispose();
-			}else {
+			} else {
 				dispose();
 			}
-			
+
 		}
-		
+
 	}
-	
+
 }
